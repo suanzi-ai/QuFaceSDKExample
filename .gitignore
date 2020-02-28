@@ -1,0 +1,16 @@
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+
+/build
+/.vscode
+/3rdparty
+/opencv
+/hisi_sdk
+/deps
+
+*.tgz
+*.tar.*
+*.zip

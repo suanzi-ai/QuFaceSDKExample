@@ -11,7 +11,7 @@ project(
   VERSION 0.1.0
   DESCRIPTION "QUFace SDK example")
 
-option(DOWNLOAD_DEPENDENCY "Download 3rd party dependencies from remote" OFF)
+option(DOWNLOAD_DEPENDENCY "Download 3rd party dependencies from remote" ON)
 
 # -- HiSiSDK --
 if(NOT DEFINED HISI_SDK_PREFIX)

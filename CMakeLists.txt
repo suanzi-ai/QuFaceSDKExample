@@ -114,3 +114,7 @@ target_link_libraries(
   QuFaceSDK::common
   ${OpenCV_LIBS}
   ${HiSiSDK_LIBS})
+
+install(TARGETS face_compare face_compare_multi face_query DESTINATION bin)
+
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION bin)

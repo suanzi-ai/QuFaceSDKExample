@@ -115,5 +115,5 @@ target_link_libraries(face_query example_common QuFaceSDK::face
 
 install(TARGETS face_compare_multi face_compare face_db_server face_detect
                 face_query DESTINATION .)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/data ${RESOURCE_PREFIX}/models
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data/ ${RESOURCE_PREFIX}/models/
         DESTINATION .)

@@ -38,7 +38,7 @@ int main(int argc, char** argv) {
   SZ_NET_CTX* netCtx = NULL;
   SZ_LICENSE_CTX* licenseCtx = NULL;
   SZ_FACE_CTX* faceCtx = NULL;
-  ret = init_handles(modelFile, &faceCtx, &licenseCtx, &netCtx);
+  ret = init_handles_ex(modelFile, &faceCtx, &licenseCtx, &netCtx);
   if (ret != SZ_RETCODE_OK) {
     goto JUMP;
   }

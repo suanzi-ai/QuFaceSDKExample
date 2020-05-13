@@ -38,14 +38,12 @@ int main(int argc, char **argv) {
       {"data/szj2.jpg"}, {"data/szj3.jpg"}};
 
   SZ_RETCODE ret;
-  SZ_NET_CTX *netCtx = NULL;
   SZ_LICENSE_CTX *licenseCtx = NULL;
   SZ_FACE_CTX *faceCtx = NULL;
-  ret = init_handles(modelFile, &faceCtx, &licenseCtx, &netCtx);
+  ret = init_handles(modelFile, &faceCtx, &licenseCtx);
   if (ret != SZ_RETCODE_OK) {
     goto JUMP;
   }
-  SZ_NET_detach(netCtx);
 
   SZ_IMAGE_CTX *imgCtx = NULL;
   SZ_BOOL bOk = SZ_FALSE;
@@ -136,7 +134,6 @@ int main(int argc, char **argv) {
 
 JUMP:
   SZ_LICENSE_CTX_release(licenseCtx);
-  SZ_NET_CTX_release(netCtx);
   SZ_IMAGE_CTX_release(imgCtx);
   for (int i = 0; i < IMG_NUM; i++) free(pfeatureList[i]);
   return ret;

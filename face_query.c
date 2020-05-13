@@ -68,14 +68,12 @@ int main(int argc, char **argv) {
   }
 
   SZ_RETCODE ret;
-  SZ_NET_CTX *netCtx = NULL;
   SZ_LICENSE_CTX *licenseCtx = NULL;
   SZ_FACE_CTX *faceCtx = NULL;
-  ret = init_handles(modelFile, &faceCtx, &licenseCtx, &netCtx);
+  ret = init_handles(modelFile, &faceCtx, &licenseCtx);
   if (ret != SZ_RETCODE_OK) {
     goto JUMP;
   }
-  SZ_NET_detach(netCtx);
 
   //创建一个图像句柄
   SZ_IMAGE_CTX *imgCtx = NULL;
@@ -118,7 +116,8 @@ int main(int argc, char **argv) {
   userInfo.age = 23;
   userInfo.sex = 1;
   memcpy(userInfo.name, "lisi", 5);
-  ret = SZ_DATABASE_add(databaseCtx, 1, pFeature, &userInfo, sizeof(UserInfo));
+  ret = SZ_DATABASE_add(databaseCtx, 1, pFeature, &userInfo,
+          sizeof(UserInfo));
   if (ret != SZ_RETCODE_OK) goto JUMP;
 
   ret = SZ_DATABASE_save(databaseCtx);
@@ -128,10 +127,6 @@ int main(int argc, char **argv) {
   if (ret != SZ_RETCODE_OK) goto JUMP;
   // printf("remove result = %s   %d   %d\n", userInfo.name, userInfo.age,
   // userInfo.sex);
-
-
-  ret = SZ_DATABASE_save(databaseCtx);
-  if (ret != SZ_RETCODE_OK) goto JUMP;
 
   //在database中检索张三人脸特征
   ret = SZ_DATABASE_query(databaseCtx, pFeature, &pQueryResults, &topN);
@@ -149,7 +144,6 @@ int main(int argc, char **argv) {
 
 JUMP:
   SZ_LICENSE_CTX_release(licenseCtx);
-  SZ_NET_CTX_release(netCtx);
   SZ_IMAGE_CTX_release(imgCtx);
   SZ_FACE_CTX_release(faceCtx);
   SZ_DATABASE_CTX_release(databaseCtx);

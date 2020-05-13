@@ -53,14 +53,12 @@ int main(int argc, char** argv) {
   }
 
   SZ_RETCODE ret;
-  SZ_NET_CTX* netCtx = NULL;
   SZ_LICENSE_CTX* licenseCtx = NULL;
   SZ_FACE_CTX* faceCtx = NULL;
-  ret = init_handles(modelFile, &faceCtx, &licenseCtx, &netCtx);
+  ret = init_handles(modelFile, &faceCtx, &licenseCtx);
   if (ret != SZ_RETCODE_OK) {
     goto JUMP;
   }
-  SZ_NET_detach(netCtx);
 
   //创建一个图像句柄
   SZ_IMAGE_CTX* imgCtx = NULL;
@@ -72,7 +70,7 @@ int main(int argc, char** argv) {
   int faceCnt = 0;
 
   // **********
-  // 读入一张人脸照片
+  // 读入第一张jpg人脸照片,然后得到人脸特征值
   // **********
   bOk = getImageFromjpg(jpgFile, &imgCtx);
   if (!bOk) {
@@ -85,6 +83,7 @@ int main(int argc, char** argv) {
     printf("[ERR] SZ_FACE_detect failed !\n");
     goto JUMP;
   }
+
 
   SZ_FACE_DETECTION faceInfo;
   for (SZ_INT32 idx = 0; idx < faceCnt; idx++) {
@@ -100,7 +99,6 @@ int main(int argc, char** argv) {
 
 JUMP:
   SZ_LICENSE_CTX_release(licenseCtx);
-  SZ_NET_CTX_release(netCtx);
   SZ_IMAGE_CTX_release(imgCtx);
   SZ_FACE_CTX_release(faceCtx);
   return ret;

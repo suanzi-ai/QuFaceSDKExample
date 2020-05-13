@@ -7,7 +7,6 @@
 
 #include <fstream>
 #include <nlohmann/json.hpp>
-
 #include "opencv2/opencv.hpp"
 #include "sz_face_module.h"
 #include "sz_image_module.h"
@@ -19,7 +18,7 @@ void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
   std::string saveName =
       std::string(jpgFile) + "_scale_" + std::to_string(scaleN) + ".jpg";
 
-  cv::Mat image(h, w, CV_8UC3, (void *)pData);
+  cv::Mat image(h, w, CV_8UC3, (void*)pData);
 
   SZ_FACE_DETECTION faceInfo;
   SZ_RETCODE ret;
@@ -34,10 +33,8 @@ void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
            faceInfo.rect.x, faceInfo.rect.y, faceInfo.rect.width,
            faceInfo.rect.height);
 
-    cv::rectangle(image,
-                  cv::Rect(faceInfo.rect.x, faceInfo.rect.y,
-                           faceInfo.rect.width, faceInfo.rect.height),
-                  cv::Scalar(255, 0, 0), 2);
+    cv::rectangle(image, cv::Rect(faceInfo.rect.x, faceInfo.rect.y,
+                                  faceInfo.rect.width, faceInfo.rect.height), cv::Scalar(255,0,0), 2);
   }
 
   cv::imwrite(saveName.c_str(), image);
@@ -151,6 +148,18 @@ JUMP:
 }
 
 SZ_RETCODE init_handles(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
+												SZ_LICENSE_CTX **pLicenseCtx) {
+	SZ_NET_CTX *netCtx = NULL;
+	if (init_handles_ex(modelFile, pFaceCtx, pLicenseCtx, &netCtx) != SZ_RETCODE_OK) {
+		return SZ_RETCODE_FAILED;
+	}
+	SZ_NET_detach(netCtx);
+	SZ_NET_CTX_release(netCtx);
+	return SZ_RETCODE_OK;
+}
+
+
+SZ_RETCODE init_handles_ex(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
                         SZ_LICENSE_CTX **pLicenseCtx, SZ_NET_CTX **pNetCtx) {
   SZ_RETCODE ret;
   NetCreateOption opts = {0};
@@ -212,7 +221,6 @@ SZ_RETCODE init_handles(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
     printf("[ERR] SZ_FACE_CTX_create failed !\n");
     return SZ_RETCODE_FAILED;
   }
-
   return SZ_RETCODE_OK;
 }
 

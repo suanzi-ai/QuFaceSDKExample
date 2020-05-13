@@ -53,14 +53,12 @@ int main(int argc, char** argv) {
   }
 
   SZ_RETCODE ret;
-  SZ_NET_CTX* netCtx = NULL;
   SZ_LICENSE_CTX* licenseCtx = NULL;
   SZ_FACE_CTX* faceCtx = NULL;
-  ret = init_handles(modelFile, &faceCtx, &licenseCtx, &netCtx);
+  ret = init_handles(modelFile, &faceCtx, &licenseCtx);
   if (ret != SZ_RETCODE_OK) {
     goto JUMP;
   }
-  SZ_NET_detach(netCtx);
 
   //创建一个图像句柄
   SZ_IMAGE_CTX* imgCtx = NULL;
@@ -133,7 +131,6 @@ int main(int argc, char** argv) {
 
 JUMP:
   SZ_LICENSE_CTX_release(licenseCtx);
-  SZ_NET_CTX_release(netCtx);
   SZ_IMAGE_CTX_release(imgCtx);
   SZ_FACE_CTX_release(faceCtx);
   return ret;

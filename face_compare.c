@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "image.h"
 #include "sdk_common.h"
 #include "sz_face_module.h"
 #include "sz_image_module.h"

@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "image.h"
 #include "sdk_common.h"
 #include "sz_database_module.h"
 #include "sz_face_module.h"
@@ -119,8 +118,11 @@ int main(int argc, char **argv) {
   userInfo.age = 23;
   userInfo.sex = 1;
   memcpy(userInfo.name, "lisi", 5);
-  ret = SZ_DATABASE_add(databaseCtx, 1, pFeature, &userInfo,
-          sizeof(UserInfo));
+  ret = SZ_DATABASE_add(databaseCtx, 1, pFeature, &userInfo, sizeof(UserInfo));
+  if (ret != SZ_RETCODE_OK) goto JUMP;
+
+  ret = SZ_DATABASE_save(databaseCtx);
+  if (ret != SZ_RETCODE_OK) goto JUMP;
 
   // ret = SZ_DATABASE_remove(databaseCtx, 1, &userInfo);
   if (ret != SZ_RETCODE_OK) goto JUMP;

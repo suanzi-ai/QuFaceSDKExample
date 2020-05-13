@@ -8,13 +8,72 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-#include "image.h"
-#include "model.h"
 #include "opencv2/opencv.hpp"
 #include "sz_face_module.h"
 #include "sz_image_module.h"
 #include "sz_license_module.h"
 #include "sz_net_module.h"
+
+void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
+                        int scaleN, int faceCnt, SZ_FACE_CTX *faceCtx) {
+  std::string saveName =
+      std::string(jpgFile) + "_scale_" + std::to_string(scaleN) + ".jpg";
+
+  cv::Mat image(h, w, CV_8UC3, (void *)pData);
+
+  SZ_FACE_DETECTION faceInfo;
+  SZ_RETCODE ret;
+  for (SZ_INT32 idx = 0; idx < faceCnt; idx++) {
+    ret = SZ_FACE_getDetectInfo(faceCtx, idx, &faceInfo);
+    if (ret != SZ_RETCODE_OK) {
+      printf("[ERR] SZ_FACE_getDetectInfo(%d) failed!\n", idx);
+      continue;
+    }
+
+    printf("Scale-%d: Face-%d [x=%d, y=%d, w=%d, h=%d]\n", scaleN, idx,
+           faceInfo.rect.x, faceInfo.rect.y, faceInfo.rect.width,
+           faceInfo.rect.height);
+
+    cv::rectangle(image,
+                  cv::Rect(faceInfo.rect.x, faceInfo.rect.y,
+                           faceInfo.rect.width, faceInfo.rect.height),
+                  cv::Scalar(255, 0, 0), 2);
+  }
+
+  cv::imwrite(saveName.c_str(), image);
+}
+
+unsigned char *loadModel(const char *modelFile, int *pModelLen) {
+  FILE *fp = fopen(modelFile, "r");
+  if (fp == NULL) return NULL;
+
+  //获取模型文件长度
+  fseek(fp, 0L, SEEK_END);
+  int fileLen = 0;
+  if ((fileLen = ftell(fp)) == -1) {
+    fclose(fp);
+    return NULL;
+  }
+
+  //分配模型缓冲
+  unsigned char *pModelData = (unsigned char *)malloc(fileLen);
+  if (pModelData == NULL) {
+    fclose(fp);
+    return NULL;
+  }
+
+  printf("[INFO] loadModel: model filelen = %d\n", fileLen);
+  //读模型数据到模型缓冲pModelData
+  rewind(fp);  // fseek(fp, 0L, SEEK_SET)的另一种写法
+  *pModelLen = fread(pModelData, 1, fileLen, fp);
+  if ((*pModelLen) != fileLen) {
+    fclose(fp);
+    return NULL;
+  }
+
+  fclose(fp);
+  return pModelData;
+}
 
 SZ_BOOL getFeature(const char *jpgFile, SZ_FACE_CTX *faceCtx,
                    SZ_IMAGE_CTX *imgCtx, SZ_FACE_FEATURE **pFeature,
@@ -155,4 +214,84 @@ SZ_RETCODE init_handles(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
   }
 
   return SZ_RETCODE_OK;
+}
+
+unsigned char *jpg2Bgr(const char *jpgFile, int *pWidth, int *pHeight) {
+  cv::Mat img = cv::imread(jpgFile);
+  if (img.empty()) {
+    printf("%s is not exist!\n", jpgFile);
+    return NULL;
+  }
+
+  // cv::resize(img, img, {200,200});
+
+  int width = img.cols;
+  int height = img.rows;
+
+  //返回图像宽度和高度
+  *pWidth = width;
+  *pHeight = height;
+
+  //分配存放BGR图像数据缓冲
+  unsigned char *pData = (unsigned char *)malloc(width * height * 3);
+  memcpy(pData, img.ptr(), width * height * 3);
+
+  //返回BGR图像数据缓冲
+  return pData;
+}
+
+unsigned char *jpg2Nv21(const char *jpgFile, int *pWidth, int *pHeight) {
+  cv::Mat img = cv::imread(jpgFile);
+  if (img.empty()) {
+    printf("%s is not exist!\n", jpgFile);
+    return NULL;
+  }
+
+  int width = img.cols;
+  int height = img.rows;
+
+  //分配存放NV21图像数据缓冲
+  unsigned char *pData = (unsigned char *)malloc(width * height * 3 / 2);
+
+  cv::Mat yuv420pImg;
+  // bgr 转 yuv420p
+  cvtColor(img, yuv420pImg, cv::COLOR_BGR2YUV_I420);
+
+  //返回图像宽度和高度
+  *pWidth = width;
+  *pHeight = height;
+
+  // yuv420p 转 nv21
+  int len = width * height;
+  memcpy(pData, yuv420pImg.ptr(), len);
+  unsigned char *p = pData + len;
+  unsigned char *u = yuv420pImg.ptr() + len;
+  unsigned char *v = yuv420pImg.ptr() + len + len / 4;
+  for (int i = 0; i < len / 4; i++) {
+    p[i * 2] = v[i];
+    p[i * 2 + 1] = u[i];
+  }
+
+  //返回NV21图像缓冲数据
+  return pData;
+}
+
+unsigned char *readImage(const char *jpgFile, int *pWidth, int *pHeight) {
+  cv::Mat img = cv::imread(jpgFile);
+  if (img.empty()) {
+    printf("Read %s Failed!\n", jpgFile);
+    return NULL;
+  }
+
+  int width = img.cols;
+  int height = img.rows;
+
+  //分配存放BGR图像数据缓冲
+  unsigned char *pData = (unsigned char *)malloc(width * height * 3);
+  memcpy(pData, img.ptr(), width * height * 3);
+
+  //返回BGR图像数据缓冲
+  *pWidth = width;
+  *pHeight = height;
+  return pData;
 }

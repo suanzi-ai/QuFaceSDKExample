@@ -56,7 +56,6 @@ int main(int argc, char** argv) {
   SZ_NET_CTX* netCtx = NULL;
   SZ_LICENSE_CTX* licenseCtx = NULL;
   SZ_FACE_CTX* faceCtx = NULL;
-  printf("hhhh\n");
   ret = init_handles(modelFile, &faceCtx, &licenseCtx, &netCtx);
   if (ret != SZ_RETCODE_OK) {
     goto JUMP;
@@ -72,31 +71,64 @@ int main(int argc, char** argv) {
   SZ_INT32 featureLen = 0;
   int faceCnt = 0;
 
-  // **********
-  // 读入第一张jpg人脸照片,然后得到人脸特征值
-  // **********
-  bOk = getImageFromjpg(jpgFile, &imgCtx);
-  if (!bOk) {
-    printf("[ERR] read %d image file failed !\n", jpgFile);
+  // ********************
+  // 读入一张jpg人脸照片
+  // ********************
+  int width = 0, height = 0;
+  unsigned char* pBgrData = readImage(jpgFile, &width, &height);
+  if (pBgrData == NULL) {
+    printf("[ERR] Read jpgFile %s failed!\n", jpgFile);
     goto JUMP;
   }
 
-  ret = SZ_FACE_detect(faceCtx, imgCtx, &faceCnt);
+  // ********************
+  // create image handle
+  // ********************
+  imgCtx = SZ_IMAGE_CTX_create(width, height, SZ_IMAGETYPE_BGR);
+  if (imgCtx == NULL) {
+    printf("[ERR] Creat imageCtx failed!\n");
+    goto JUMP;
+  }
+  ret = SZ_IMAGE_setData(imgCtx, pBgrData, width, height);
+  if (ret != SZ_RETCODE_OK) {
+    printf("[ERR] setData failed!\n");
+    goto JUMP;
+  }
+
+  // ********************
+  // face detect scaleN=3 and save results to File
+  // ********************
+  int scaleN = 3;
+  ret = SZ_FACE_detect_mscale(faceCtx, imgCtx, scaleN, &faceCnt);
   if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
     printf("[ERR] SZ_FACE_detect failed !\n");
-    goto JUMP;
+  } else {
+    saveDetection2File(jpgFile, pBgrData, width, height, scaleN, faceCnt,
+                       faceCtx);
   }
 
-  SZ_FACE_DETECTION faceInfo;
-  for (SZ_INT32 idx = 0; idx < faceCnt; idx++) {
-    ret = SZ_FACE_getDetectInfo(faceCtx, idx, &faceInfo);
-    if (ret != SZ_RETCODE_OK) {
-      printf("[ERR] SZ_FACE_getDetectInfo(%d) failed!\n", idx);
-      continue;
-    }
+  // ********************
+  // face detect scaleN=5 and save results to File
+  // ********************
+  scaleN = 5;
+  ret = SZ_FACE_detect_mscale(faceCtx, imgCtx, scaleN, &faceCnt);
+  if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
+    printf("[ERR] SZ_FACE_detect failed !\n");
+  } else {
+    saveDetection2File(jpgFile, pBgrData, width, height, scaleN, faceCnt,
+                       faceCtx);
+  }
 
-    printf("Face_%d: [x=%d, y=%d, w=%d, h=%d]\n", idx, faceInfo.rect.x,
-           faceInfo.rect.y, faceInfo.rect.width, faceInfo.rect.height);
+  // ********************
+  // face detect scaleN=7 and save results to File
+  // ********************
+  scaleN = 7;
+  ret = SZ_FACE_detect_mscale(faceCtx, imgCtx, scaleN, &faceCnt);
+  if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
+    printf("[ERR] SZ_FACE_detect failed !\n");
+  } else {
+    saveDetection2File(jpgFile, pBgrData, width, height, scaleN, faceCnt,
+                       faceCtx);
   }
 
 JUMP:

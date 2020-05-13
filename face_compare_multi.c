@@ -3,7 +3,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "image.h"
 #include "sdk_common.h"
 #include "sz_face_module.h"
 #include "sz_image_module.h"
@@ -58,19 +57,31 @@ int main(int argc, char **argv) {
   SZ_FACE_FEATURE *pfeatureList[IMG_NUM];
   float scores[IMG_NUM][IMG_NUM] = {1.0};
 
+  // **********
+  // 读入人脸照片, 提取人脸特征值
+  // **********
   for (int i = 0; i < IMG_NUM; i++) {
     printf("[INFO] jpgFiles: %d %s \n", i, jpgFiles[i]);
 
-    // **********
-    // 读入人脸照片,然后得到人脸特征值
-    // **********
     bOk = getImageFromjpg(jpgFiles[i], &imgCtx);
     if (!bOk) goto JUMP;
 
-    ret = SZ_FACE_detect(faceCtx, imgCtx, &faceCnt);
+    ret = SZ_FACE_detect_mscale(faceCtx, imgCtx, 3, &faceCnt);
     if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
       printf("[ERR] SZ_FACE_detect failed !\n");
       goto JUMP;
+    }
+
+    SZ_FACE_DETECTION faceInfo;
+    for (SZ_INT32 idx = 0; idx < faceCnt; idx++) {
+      ret = SZ_FACE_getDetectInfo(faceCtx, idx, &faceInfo);
+      if (ret != SZ_RETCODE_OK) {
+        printf("[ERR] SZ_FACE_getDetectInfo(%d) failed!\n", idx);
+        continue;
+      }
+
+      printf("Face_%d: [x=%d, y=%d, w=%d, h=%d]\n", idx, faceInfo.rect.x,
+             faceInfo.rect.y, faceInfo.rect.width, faceInfo.rect.height);
     }
 
     ret = SZ_FACE_evaluate(faceCtx, imgCtx, 0, &quality);

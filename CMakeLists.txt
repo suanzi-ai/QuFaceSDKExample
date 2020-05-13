@@ -74,17 +74,17 @@ if(DOWNLOAD_DEPENDENCY)
     ${HISI_SDK_PREFIX})
 
   download_and_extract(
-    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/releases/QuFaceSDK-0.9.6-hisi-rp-dv300.tar.gz
-    ${DOWNLOAD_DIR}/QuFaceSDK-0.9.6-hisi-rp-dv300.tar.gz
+    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/releases/QuFaceSDK-0.10.1-hisi-rp-dv300.tar.gz
+    ${DOWNLOAD_DIR}/QuFaceSDK-0.10.1-hisi-rp-dv300.tar.gz
     SHA256
-    0f8d3ab9a815ddb304f017b39c9aecd7ed2f21db0999d54146bac818c3985d32
+    ad0100acde0b0fef2c8715c6a30b117f2871864f6f10a9e26b10812635bab2ef
     ${QUFACE_SDK_PREFIX})
 
   download_and_extract(
-    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/hisi/hisi-model-0.1.0.tar.gz
-    ${DOWNLOAD_DIR}/hisi-model-0.1.0.tar.gz
+    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/hisi/hisi-model-1.0.0.zip
+    ${DOWNLOAD_DIR}/hisi-model-1.0.0.zip
     SHA256
-    e3b9e9c7f9f62f1f6c20a70b2c5220ae9303caaf610d5c61e2a40a4ac41e3bf4
+    2718f5af7a2cfe7211734c18a432f73c3f537d02723184cf1ace6c072b340cea
     ${RESOURCE_PREFIX}/models)
 endif()
 
@@ -108,6 +108,9 @@ target_link_libraries(face_db_server example_common QuFaceSDK::face
 
 add_executable(face_detect face_detect.c)
 target_link_libraries(face_detect example_common QuFaceSDK::face)
+
+add_executable(face_detect_mscale face_detect_mscale.c)
+target_link_libraries(face_detect_mscale example_common QuFaceSDK::face)
 
 add_executable(face_query face_query.c)
 target_link_libraries(face_query example_common QuFaceSDK::face

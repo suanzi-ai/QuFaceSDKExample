@@ -86,12 +86,6 @@ if(DOWNLOAD_DEPENDENCY)
     SHA256
     e3b9e9c7f9f62f1f6c20a70b2c5220ae9303caaf610d5c61e2a40a4ac41e3bf4
     ${RESOURCE_PREFIX}/models)
-  download_and_extract(
-    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/hisi/Adobe-SongTi-Std-L.zip
-    ${DOWNLOAD_DIR}/Adobe-SongTi-Std-L.zip
-    SHA256
-    41a16d79b91ae10b712c116d49bb710101e74e51bbe68f50f932f8f2051ec528
-    ${RESOURCE_PREFIX}/fonts)
 endif()
 
 find_package(QuFaceSDK REQUIRED)
@@ -134,4 +128,5 @@ install(
           face_query
           mask_detect
   DESTINATION .)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/data DESTINATION .)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/data ${RESOURCE_PREFIX}/models
+        DESTINATION .)

@@ -32,6 +32,7 @@ cd QuFaceSDKExample
 - face_compare: 人脸比对样例
 - face_compare_multi: 多人脸比对样例
 - face_detect: 人脸检测样例
+- face_detect_mscale: 人脸多尺度检测样例
 - face_db_server: 人脸库远程更新样例
 - face_query: 人脸检索样例
 

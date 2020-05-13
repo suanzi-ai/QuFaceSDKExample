@@ -4,12 +4,10 @@
 *.dylib
 *.dll
 
-/build
 /.vscode
-/3rdparty
-/opencv
-/hisi_sdk
+/build
 /deps
+/resources
 
 *.tgz
 *.tar.*

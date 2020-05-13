@@ -103,7 +103,8 @@ add_executable(face_compare face_compare.c)
 target_link_libraries(face_compare example_common QuFaceSDK::face)
 
 add_executable(face_db_server face_db_server.c)
-target_link_libraries(face_db_server example_common QuFaceSDK::face)
+target_link_libraries(face_db_server example_common QuFaceSDK::face
+                      QuFaceSDK::database QuFaceSDK::faceServer)
 
 add_executable(face_detect face_detect.c)
 target_link_libraries(face_detect example_common QuFaceSDK::face)

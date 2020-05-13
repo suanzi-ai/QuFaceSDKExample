@@ -67,8 +67,8 @@ cmake --build . --target install
 popd
 
 echo -e "\n#####################################################\n"
-echo -e "设备账号信息请按文档说明获取：file://$(pwd)/deps/qufacesdk/share/doc/QuFaceSDK/html/index.html"
-echo -e "请将下面的文件夹内容拷贝至开发板后，手动运行程序即可: "
+echo -e "设备账号信息请按文档说明获取："
+echo -e "\t file://$(pwd)/deps/qufacesdk/share/doc/QuFaceSDK/html/index.html"
+echo -e "\n请将下面的文件夹内容拷贝至开发板后，手动运行程序即可: "
 echo -e "\t $install_dir"
-ls -lh $install_dir
 echo -e "\n#####################################################\n"

@@ -60,31 +60,51 @@ if(DOWNLOAD_DEPENDENCY)
   set(DOWNLOAD_DIR "${PROJECT_DEPENDENCY_DIR}/download")
 
   download_and_extract(
+    URL
     https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/deps/prebuild-3rd-0.1.2.tar.gz
+    FILENAME
     ${DOWNLOAD_DIR}/prebuild-3rd-0.1.2.tar.gz
+    HASH_TYPE
     SHA256
+    HASH
     2f129d529e599395b29b21b6d7d5b694b5f158f573433a2f911c834cb314e148
+    EXTRACT_DIR
     ${THIRD_PARTY_PREFIX})
 
   download_and_extract(
+    URL
     https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/hisi/rp-dv300-sdk.tgz
+    FILENAME
     ${DOWNLOAD_DIR}/rp-dv300-sdk.tgz
+    HASH_TYPE
     SHA256
+    HASH
     f9075af18adbb95a21789f6d79ca98fa1f92fee0696a2d156a88425fa4efdbcb
+    EXTRACT_DIR
     ${HISI_SDK_PREFIX})
 
   download_and_extract(
+    URL
     https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/releases/QuFaceSDK-0.10.5-hisi-rp-dv300.tar.gz
+    FILENAME
     ${DOWNLOAD_DIR}/QuFaceSDK-0.10.5-hisi-rp-dv300.tar.gz
+    HASH_TYPE
     SHA256
+    HASH
     8cfa03f2dc4c3b9ef11addfbb82d4df15b28773be3c0625b115e0850e29d309d
+    EXTRACT_DIR
     ${QUFACE_SDK_PREFIX})
 
   download_and_extract(
+    URL
     https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/hisi/hisi-model-1.0.0.zip
+    FILENAME
     ${DOWNLOAD_DIR}/hisi-model-1.0.0.zip
+    HASH_TYPE
     SHA256
+    HASH
     2718f5af7a2cfe7211734c18a432f73c3f537d02723184cf1ace6c072b340cea
+    EXTRACT_DIR
     ${RESOURCE_PREFIX}/models)
 endif()
 

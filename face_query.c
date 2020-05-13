@@ -1,12 +1,15 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "image.h"
-#include "model.h"
 #include "sdk_common.h"
 #include "sz_database_module.h"
 #include "sz_face_module.h"
 #include "sz_image_module.h"
+#include "sz_license_module.h"
+#include "sz_net_module.h"
 
 static void usage(char **argv) {
   printf(
@@ -65,19 +68,19 @@ int main(int argc, char **argv) {
     return -1;
   }
 
-  //加载模型并创建人脸算法句柄
-  int modelLen = 0;
-  unsigned char *pModelData = loadModel(modelFile, &modelLen);
-  SZ_HANDLE faceHandle = NULL;
-  SZ_RETCODE ret = gszFace.createHandle(pModelData, modelLen, &faceHandle);
-  free(pModelData);
+  SZ_RETCODE ret;
+  SZ_NET_CTX *netCtx = NULL;
+  SZ_LICENSE_CTX *licenseCtx = NULL;
+  SZ_FACE_CTX *faceCtx = NULL;
+  ret = init_handles(modelFile, &faceCtx, &licenseCtx, &netCtx);
   if (ret != SZ_RETCODE_OK) {
-    return -1;
+    goto JUMP;
   }
+  SZ_NET_detach(netCtx);
 
   //创建一个图像句柄
-  SZ_HANDLE imgHandle = NULL;
-  SZ_HANDLE databaseHandle = NULL;
+  SZ_IMAGE_CTX *imgCtx = NULL;
+  SZ_DATABASE_CTX *databaseCtx = NULL;
   SZ_BOOL bOk = SZ_FALSE;
   SZ_FLOAT compareScore = 0.0;
   SZ_QUERY_RESULT *pQueryResults;
@@ -85,16 +88,16 @@ int main(int argc, char **argv) {
   SZ_INT32 topN = 0;
   SZ_FACE_FEATURE *pFeature = NULL;
   int i = 0;
-  ret = gszImage.createHandle(1920, 1080, SZ_IMAGETYPE_BGR, &imgHandle);
-  if (ret != SZ_RETCODE_OK) goto JUMP;
+  imgCtx = SZ_IMAGE_CTX_create(1920, 1080, SZ_IMAGETYPE_BGR);
+  if (imgCtx == NULL) goto JUMP;
 
   //创建一个人脸检索数据库句柄
-  ret = gszDatabase.createHandle("database", &databaseHandle);
-  if (ret != SZ_RETCODE_OK) goto JUMP;
+  databaseCtx = SZ_DATABASE_CTX_create("database");
+  if (databaseCtx == NULL) goto JUMP;
 
   //输入一张jpg人脸照片,然后得到人脸特征值
   SZ_INT32 featureLen = 0;
-  bOk = getFeature(jpgFile1, faceHandle, imgHandle, &pFeature, &featureLen);
+  bOk = getFeature(jpgFile1, faceCtx, imgCtx, &pFeature, &featureLen);
   if (!bOk) goto JUMP;
 
   //增加张三人脸特征到database中
@@ -103,12 +106,12 @@ int main(int argc, char **argv) {
   userInfo.age = 29;
   userInfo.sex = 0;
   memcpy(userInfo.name, "zhangsan", 9);
-  // ret = gszDatabase.add(databaseHandle, 0, pFeature, &userInfo,
+  // ret = SZ_DATABASE_add(databaseCtx, 0, pFeature, &userInfo,
   //                     sizeof(UserInfo));
   if (ret != SZ_RETCODE_OK) goto JUMP;
 
   //输入一张jpg人脸照片,然后得到人脸特征值
-  bOk = getFeature(jpgFile2, faceHandle, imgHandle, &pFeature, &featureLen);
+  bOk = getFeature(jpgFile2, faceCtx, imgCtx, &pFeature, &featureLen);
   if (!bOk) goto JUMP;
 
   //增加李四人脸特征到database中
@@ -116,16 +119,16 @@ int main(int argc, char **argv) {
   userInfo.age = 23;
   userInfo.sex = 1;
   memcpy(userInfo.name, "lisi", 5);
-  // ret = gszDatabase.add(databaseHandle, 1, pFeature, &userInfo,
+  // ret = SZ_DATABASE_add(databaseCtx, 1, pFeature, &userInfo,
   //        sizeof(UserInfo));
 
-  // ret = gszDatabase.remove(databaseHandle, 1, &userInfo);
+  // ret = SZ_DATABASE_remove(databaseCtx, 1, &userInfo);
   if (ret != SZ_RETCODE_OK) goto JUMP;
   // printf("remove result = %s   %d   %d\n", userInfo.name, userInfo.age,
   // userInfo.sex);
 
   //在database中检索张三人脸特征
-  ret = gszDatabase.query(databaseHandle, pFeature, &pQueryResults, &topN);
+  ret = SZ_DATABASE_query(databaseCtx, pFeature, &pQueryResults, &topN);
   if (ret != SZ_RETCODE_OK) goto JUMP;
 
   printf("topN: %d \n", topN);
@@ -139,8 +142,10 @@ int main(int argc, char **argv) {
   }
 
 JUMP:
-  gszImage.releaseHandle(imgHandle);
-  gszFace.releaseHandle(faceHandle);
-  gszDatabase.releaseHandle(databaseHandle);
+  SZ_LICENSE_CTX_release(licenseCtx);
+  SZ_NET_CTX_release(netCtx);
+  SZ_IMAGE_CTX_release(imgCtx);
+  SZ_FACE_CTX_release(faceCtx);
+  SZ_DATABASE_CTX_release(databaseCtx);
   return ret;
 }

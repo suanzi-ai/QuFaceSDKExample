@@ -1,11 +1,14 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include "image.h"
-#include "model.h"
 #include "sdk_common.h"
 #include "sz_face_module.h"
 #include "sz_image_module.h"
+#include "sz_license_module.h"
+#include "sz_net_module.h"
 
 #define IMG_NUM 8
 static void usage(char **argv) {
@@ -35,18 +38,17 @@ int main(int argc, char **argv) {
       {"data/zxy1.jpg"}, {"data/zxy2.jpg"}, {"data/szj1.jpg"},
       {"data/szj2.jpg"}, {"data/szj3.jpg"}};
 
-  //加载模型
-  int modelLen = 0;
-  unsigned char *pModelData = loadModel(modelFile, &modelLen);
-  SZ_HANDLE faceHandle = NULL;
-  SZ_RETCODE ret = gszFace.createHandle(pModelData, modelLen, &faceHandle);
-  free(pModelData);
+  SZ_RETCODE ret;
+  SZ_NET_CTX *netCtx = NULL;
+  SZ_LICENSE_CTX *licenseCtx = NULL;
+  SZ_FACE_CTX *faceCtx = NULL;
+  ret = init_handles(modelFile, &faceCtx, &licenseCtx, &netCtx);
   if (ret != SZ_RETCODE_OK) {
-    printf("[ERR] gszFace.createHandle failed !\n");
-    return -1;
+    goto JUMP;
   }
+  SZ_NET_detach(netCtx);
 
-  SZ_HANDLE imgHandle = NULL;
+  SZ_IMAGE_CTX *imgCtx = NULL;
   SZ_BOOL bOk = SZ_FALSE;
   SZ_FLOAT compareScore = 0.0;
   SZ_FACE_FEATURE *pFeature = NULL;
@@ -62,36 +64,40 @@ int main(int argc, char **argv) {
     // **********
     // 读入人脸照片,然后得到人脸特征值
     // **********
-    bOk = getImageFromjpg(jpgFiles[i], &imgHandle);
+    bOk = getImageFromjpg(jpgFiles[i], &imgCtx);
     if (!bOk) goto JUMP;
 
-    ret = gszFace.detect(faceHandle, imgHandle, &faceCnt);
+    ret = SZ_FACE_detect(faceCtx, imgCtx, &faceCnt);
     if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
-      printf("[ERR] gszFace.detect failed !\n");
+      printf("[ERR] SZ_FACE_detect failed !\n");
       goto JUMP;
     }
 
-    ret = gszFace.evaluate(faceHandle, imgHandle, 0, &quality);
+    ret = SZ_FACE_evaluate(faceCtx, imgCtx, 0, &quality);
     printf("[INFO] face quality: (%f, %f, %f, %f, %f, %f)\n", quality.pitch,
            quality.yaw, quality.roll, quality.leftScore, quality.rightScore,
            quality.mouthScore);
 
     // 获取索引0的脸的特征
-    ret = gszFace.extractFeatureByIndex(faceHandle, imgHandle, 0, &pFeature,
+    ret = SZ_FACE_extractFeatureByIndex(faceCtx, imgCtx, 0, &pFeature,
                                         &featureLen);
     //保存抽取的特征，防止特征被覆盖
     pfeatureList[i] = (SZ_FACE_FEATURE *)malloc(featureLen);
     memcpy(pfeatureList[i], pFeature, featureLen);
   }
 
-  printf("==============================\n");
-  printf("======all compare scores=======\n");
+  printf(
+      "========================================================================"
+      "==================\n");
+  printf(
+      "====================================all compare "
+      "scores====================================\n");
   for (int i = 0; i < IMG_NUM; i++) {
     for (int j = i + 1; j < IMG_NUM; j++) {
-      ret = gszFace.compareFeature(faceHandle, pfeatureList[i], pfeatureList[j],
+      ret = SZ_FACE_compareFeature(faceCtx, pfeatureList[i], pfeatureList[j],
                                    &compareScore);
       if (ret != SZ_RETCODE_OK) {
-        printf("[ERR] gszFace.compareFeature failed at %s %s!\n", jpgFiles[i],
+        printf("[ERR] SZ_FACE_compareFeature failed at %s %s!\n", jpgFiles[i],
                jpgFiles[j]);
       } else {
         // printf(" [%s] vs [%s]:  %0.3f\n\n", jpgFiles[i], jpgFiles[j],
@@ -118,8 +124,9 @@ int main(int argc, char **argv) {
   }
 
 JUMP:
-  gszImage.releaseHandle(imgHandle);
-  gszFace.releaseHandle(faceHandle);
+  SZ_LICENSE_CTX_release(licenseCtx);
+  SZ_NET_CTX_release(netCtx);
+  SZ_IMAGE_CTX_release(imgCtx);
   for (int i = 0; i < IMG_NUM; i++) free(pfeatureList[i]);
   return ret;
 }

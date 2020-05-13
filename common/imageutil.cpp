@@ -175,6 +175,7 @@ bool bgrPlanar2BgrPacked(Image *pDest, const Image *pSrc) {
     pDst[i * 3 + 1] = pg[i];
     pDst[i * 3 + 2] = pr[i];
   }
+  return true;
 }
 
 bool bgrPacked2BgrPlanar(Image *pDest, const Image *pSrcImage) {
@@ -192,6 +193,7 @@ bool bgrPacked2BgrPlanar(Image *pDest, const Image *pSrcImage) {
     pg[i] = pSrc[i * 3 + 1];
     pr[i] = pSrc[i * 3 + 2];
   }
+  return true;
 }
 
 void bgrPlanar2BgrPacked(char *pDst, const char *pSrc, int width, int height) {

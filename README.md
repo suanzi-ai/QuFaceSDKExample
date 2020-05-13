@@ -2,7 +2,7 @@
 
 ### 获取项目代码
 
-可以直接[下载](https://github.com/suanzi-ai/FaceRecognitionTerminalDemo/archive/master.zip)。
+可以直接[下载](https://github.com/suanzi-ai/QuFaceSDKExample/archive/master.zip)。
 
 或者也可以直接克隆方式：
 

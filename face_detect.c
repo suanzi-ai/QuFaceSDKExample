@@ -56,7 +56,6 @@ int main(int argc, char** argv) {
   SZ_NET_CTX* netCtx = NULL;
   SZ_LICENSE_CTX* licenseCtx = NULL;
   SZ_FACE_CTX* faceCtx = NULL;
-  printf("hhhh\n");
   ret = init_handles(modelFile, &faceCtx, &licenseCtx, &netCtx);
   if (ret != SZ_RETCODE_OK) {
     goto JUMP;
@@ -73,7 +72,7 @@ int main(int argc, char** argv) {
   int faceCnt = 0;
 
   // **********
-  // 读入第一张jpg人脸照片,然后得到人脸特征值
+  // 读入一张人脸照片
   // **********
   bOk = getImageFromjpg(jpgFile, &imgCtx);
   if (!bOk) {

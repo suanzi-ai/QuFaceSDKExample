@@ -96,9 +96,6 @@ include_directories(common)
 add_library(example_common STATIC ${EXAMPLE_COMMON_FILES})
 target_link_libraries(example_common QuFaceSDK::common)
 
-add_executable(face_anti_spoofing face_anti_spoofing.c)
-target_link_libraries(face_anti_spoofing example_common QuFaceSDK::face)
-
 add_executable(face_compare_multi face_compare_multi.c)
 target_link_libraries(face_compare_multi example_common QuFaceSDK::face)
 
@@ -115,18 +112,7 @@ add_executable(face_query face_query.c)
 target_link_libraries(face_query example_common QuFaceSDK::face
                       QuFaceSDK::database)
 
-add_executable(mask_detect mask_detect.c)
-target_link_libraries(mask_detect example_common QuFaceSDK::face
-                      QuFaceSDK::database)
-
-install(
-  TARGETS face_anti_spoofing
-          face_compare_multi
-          face_compare
-          face_db_server
-          face_detect
-          face_query
-          mask_detect
-  DESTINATION .)
+install(TARGETS face_compare_multi face_compare face_db_server face_detect
+                face_query DESTINATION .)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data ${RESOURCE_PREFIX}/models
         DESTINATION .)

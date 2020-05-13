@@ -106,8 +106,8 @@ int main(int argc, char **argv) {
   userInfo.age = 29;
   userInfo.sex = 0;
   memcpy(userInfo.name, "zhangsan", 9);
-  // ret = SZ_DATABASE_add(databaseCtx, 0, pFeature, &userInfo,
-  //                     sizeof(UserInfo));
+  ret = SZ_DATABASE_add(databaseCtx, 0, pFeature, &userInfo,
+                       sizeof(UserInfo));
   if (ret != SZ_RETCODE_OK) goto JUMP;
 
   //输入一张jpg人脸照片,然后得到人脸特征值
@@ -119,13 +119,17 @@ int main(int argc, char **argv) {
   userInfo.age = 23;
   userInfo.sex = 1;
   memcpy(userInfo.name, "lisi", 5);
-  // ret = SZ_DATABASE_add(databaseCtx, 1, pFeature, &userInfo,
-  //        sizeof(UserInfo));
+  ret = SZ_DATABASE_add(databaseCtx, 1, pFeature, &userInfo,
+          sizeof(UserInfo));
 
   // ret = SZ_DATABASE_remove(databaseCtx, 1, &userInfo);
   if (ret != SZ_RETCODE_OK) goto JUMP;
   // printf("remove result = %s   %d   %d\n", userInfo.name, userInfo.age,
   // userInfo.sex);
+
+
+  ret = SZ_DATABASE_save(databaseCtx);
+  if (ret != SZ_RETCODE_OK) goto JUMP;
 
   //在database中检索张三人脸特征
   ret = SZ_DATABASE_query(databaseCtx, pFeature, &pQueryResults, &topN);

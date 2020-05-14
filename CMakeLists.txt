@@ -95,13 +95,13 @@ if(DOWNLOAD_DEPENDENCY)
 
   download_and_extract(
     URL
-    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/hisi/hisi-model-1.0.0.zip
+    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/hisi/hisi-model-2.0.0.zip
     FILENAME
-    ${DOWNLOAD_DIR}/hisi-model-1.0.0.zip
+    ${DOWNLOAD_DIR}/hisi-model-2.0.0.zip
     HASH_TYPE
     SHA256
     HASH
-    2718f5af7a2cfe7211734c18a432f73c3f537d02723184cf1ace6c072b340cea
+    4ccfeaf60be028ff0484e62e19ddd1f977710321390b98b36f543f1ab4c8c488
     EXTRACT_DIR
     ${RESOURCE_PREFIX}/models
     RM_EXTRAT_DIR_IF_EXISTS)

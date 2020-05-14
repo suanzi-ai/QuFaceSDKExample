@@ -85,13 +85,11 @@ if(DOWNLOAD_DEPENDENCY)
 
   download_and_extract(
     URL
-    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/releases/QuFaceSDK-0.10.6-hisi-rp-dv300.tar.gz
+    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/releases/QuFaceSDK-latest-hisi-rp-dv300.tar.gz
     FILENAME
-    ${DOWNLOAD_DIR}/QuFaceSDK-0.10.6-hisi-rp-dv300.tar.gz
+    ${DOWNLOAD_DIR}/QuFaceSDK-latest-hisi-rp-dv300.tar.gz
     HASH_TYPE
     SHA256
-    HASH
-    8cfa03f2dc4c3b9ef11addfbb82d4df15b28773be3c0625b115e0850e29d309d
     EXTRACT_DIR
     ${QUFACE_SDK_PREFIX})
 

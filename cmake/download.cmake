@@ -1,18 +1,20 @@
 function(download_file url filename)
-  message(STATUS "Download ${url} to ${filename} ...")
+  message(STATUS "Download to ${filename} ...")
   file(DOWNLOAD ${url} ${filename} TIMEOUT 600)
 endfunction()
 
 function(download_file_with_hash url filename hash_type hash)
-  message(STATUS "Download ${url} to ${filename} ...")
-  file(
-    DOWNLOAD ${url} ${filename}
-    TIMEOUT 600 # seconds
-    EXPECTED_HASH ${hash_type}=${hash})
+  message(STATUS "Download to ${filename} ...")
+  file(DOWNLOAD ${url} ${filename} TIMEOUT 600)
+
+  file(${hash_type} ${filename} _ACTUAL_CHKSUM)
+  if(NOT (${_ACTUAL_CHKSUM} EQUAL ${hash}))
+    message(FATAL_ERROR "Download failed, hash mismatch")
+  endif()
 endfunction()
 
 function(extrat_file filename extract_dir)
-  message(STATUS "Extract ${filename} to ${extract_dir} ...")
+  message(STATUS "Extract to ${extract_dir} ...")
 
   set(temp_dir ${CMAKE_BINARY_DIR}/tmp_for_extract.dir)
   if(EXISTS ${temp_dir})
@@ -64,29 +66,34 @@ function(download_and_extract)
     endif()
   endif()
 
-  if(NOT EXISTS ${DAE_FILENAME})
-    download_file(${DAE_URL} ${DAE_FILENAME})
-    if(NOT DAE_HASH)
-      download_file(${DAE_URL}.sig ${DAE_FILENAME}.sig)
-    endif()
-  endif()
-
-  file(${DAE_HASH_TYPE} ${DAE_FILENAME} _ACTUAL_CHKSUM)
-
-  if(NOT DAE_HASH)
+  if(NOT DEFINED DAE_HASH)
+    download_file(${DAE_URL}.sig ${DAE_FILENAME}.sig)
     file(READ ${DAE_FILENAME}.sig _SIG_CONTENT)
     if(_SIG_CONTENT MATCHES "^([0-9a-z]+) ")
       set(_EXPECT_HASH ${CMAKE_MATCH_1})
+    else()
+      message(FATAL_ERROR "Signature file content error")
     endif()
   else()
     set(_EXPECT_HASH ${DAE_HASH})
   endif()
 
-  if(NOT (${_EXPECT_HASH} STREQUAL ${_ACTUAL_CHKSUM}))
-    message(STATUS "Expect ${_EXPECT_HASH}")
-    message(STATUS "Actual ${_ACTUAL_CHKSUM}")
-    message(FATAL_ERROR "File hash miss match ..., please delete and retry")
-  endif()
+  if(EXISTS ${DAE_FILENAME})
+    file(${DAE_HASH_TYPE} ${DAE_FILENAME} _ACTUAL_CHKSUM)
 
+    if(NOT (${_EXPECT_HASH} STREQUAL ${_ACTUAL_CHKSUM}))
+      message(STATUS "Expect ${DAE_HASH_TYPE}=${_EXPECT_HASH}")
+      message(STATUS "Actual ${DAE_HASH_TYPE}=${_ACTUAL_CHKSUM}")
+      message(WARNING "File hash mismatch, remove & retry ...")
+      file(REMOVE ${DAE_FILENAME})
+      download_file_with_hash(${DAE_URL} ${DAE_FILENAME} ${DAE_HASH_TYPE}
+                              ${_EXPECT_HASH})
+    else()
+      message(STATUS "Using exists local file ${DAE_FILENAME}")
+    endif()
+  else()
+    download_file_with_hash(${DAE_URL} ${DAE_FILENAME} ${DAE_HASH_TYPE}
+                            ${_EXPECT_HASH})
+  endif()
   extrat_file(${DAE_FILENAME} ${DAE_EXTRACT_DIR})
 endfunction()

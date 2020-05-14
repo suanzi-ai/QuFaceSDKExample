@@ -55,9 +55,7 @@ int main(int argc, char** argv) {
   int faceCnt = 0;
 
   for (int i = 0; i < IMG_NUM; i++) {
-    // **********
-    // 读入人脸照片,然后得到人脸特征值
-    // **********
+
     bOk = getImageFromjpg(jpgFiles[i], &imgCtx);
     if (!bOk) goto JUMP;
 
@@ -66,11 +64,6 @@ int main(int argc, char** argv) {
       printf("[ERR] SZ_FACE_detect failed !\n");
       goto JUMP;
     }
-
-    // ret = SZ_FACE_evaluate(faceCtx, imgCtx, 0, &quality);
-    // printf("[INFO] face quality: (%f, %f, %f, %f, %f, %f)\n", quality.pitch,
-    //        quality.yaw, quality.roll, quality.leftScore, quality.rightScore,
-    //        quality.mouthScore);
 
     clock_t t1, t2;
     SZ_ATTRIBUTE* attributes;

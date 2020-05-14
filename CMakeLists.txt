@@ -19,7 +19,7 @@ endif()
 
 project(
   QuFaceSDKExample
-  VERSION 0.1.0
+  VERSION 0.2.0
   DESCRIPTION "QuFace SDK example")
 
 set(CMAKE_CXX_STANDARD 11)
@@ -121,6 +121,9 @@ target_link_libraries(face_compare_multi example_common QuFaceSDK::face)
 add_executable(face_compare face_compare.c)
 target_link_libraries(face_compare example_common QuFaceSDK::face)
 
+add_executable(face_anti_spoofing face_anti_spoofing.c)
+target_link_libraries(face_anti_spoofing example_common QuFaceSDK::face)
+
 add_executable(face_db_server face_db_server.c)
 target_link_libraries(face_db_server example_common QuFaceSDK::face
                       QuFaceSDK::database QuFaceSDK::faceServer)
@@ -135,7 +138,7 @@ add_executable(face_query face_query.c)
 target_link_libraries(face_query example_common QuFaceSDK::face
                       QuFaceSDK::database)
 
-install(TARGETS face_compare_multi face_compare face_db_server face_detect
+install(TARGETS face_compare_multi face_compare face_anti_spoofing face_db_server face_detect
                 face_detect_mscale face_query DESTINATION .)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data ${RESOURCE_PREFIX}/models/
         DESTINATION .)

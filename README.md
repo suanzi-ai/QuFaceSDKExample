@@ -70,25 +70,29 @@ ntpd: setting time to 2020-05-13 07:15:47.034944 (offset +1589348731.741161s)
 
 - face_detect: 人脸检测样例
 ```
-./face_detect -a data/lyf1.jpg -b facemodel_v2.bin
+./face_detect -a data/lyf1.jpg -b facemodel_vX.bin
 ```
 
 - face_detect_mscale: 人脸多尺度检测样例
 ```
-./face_detect_mscale  -b facemodel_v2.bin  -a  data/faces1.png
+./face_detect_mscale  -b facemodel_vX.bin  -a  data/faces1.png
 ```
 检测结果图像保存为data/faces1.png_scale_5.jpg和data/faces1.png_scale_7.jpg。
 
 - face_compare: 人脸比对样例
 ```
-./face_compare -c facemodel_v2.bin -a data/szj1.jpg -b data/szj3.jpg
+./face_compare -c facemodel_vX.bin -a data/szj1.jpg -b data/szj3.jpg
 ```
 
 - face_compare_multi: 多人脸比对样例
 ```
-./face_compare_multi  facemodel_v2.bin
+./face_compare_multi  facemodel_vX.bin
 ```
 
+- face_anti_spoofing: 活体检测样例
+```
+./face_anti_spoofing  facemodel_vX.bin
+```
 - face_query: 人脸检索样例
 
 - face_db_server: 人脸库远程更新样例

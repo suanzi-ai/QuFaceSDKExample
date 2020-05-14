@@ -108,6 +108,7 @@ if(DOWNLOAD_DEPENDENCY)
 endif()
 
 find_package(QuFaceSDK REQUIRED)
+message(STATUS "Found QuFaceSDK ${QuFaceSDK_VERSION}")
 
 file(GLOB EXAMPLE_COMMON_FILES common/*.c*)
 include_directories(common)

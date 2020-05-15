@@ -104,7 +104,7 @@ if(DOWNLOAD_DEPENDENCY)
     4ccfeaf60be028ff0484e62e19ddd1f977710321390b98b36f543f1ab4c8c488
     EXTRACT_DIR
     ${RESOURCE_PREFIX}/models
-    RM_EXTRAT_DIR_IF_EXISTS)
+    REMOVE_EXTRACT_DIR_IF_EXISTS)
 endif()
 
 find_package(QuFaceSDK REQUIRED)
@@ -139,7 +139,14 @@ add_executable(face_query face_query.c)
 target_link_libraries(face_query example_common QuFaceSDK::face
                       QuFaceSDK::database)
 
-install(TARGETS face_compare_multi face_compare face_anti_spoofing face_db_server face_detect
-                face_detect_mscale face_query DESTINATION .)
+install(
+  TARGETS face_compare_multi
+          face_compare
+          face_anti_spoofing
+          face_db_server
+          face_detect
+          face_detect_mscale
+          face_query
+  DESTINATION .)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data ${RESOURCE_PREFIX}/models/
         DESTINATION .)

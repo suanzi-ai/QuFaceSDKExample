@@ -68,14 +68,14 @@ ntpd: setting time to 2020-05-13 07:15:47.034944 (offset +1589348731.741161s)
 #### 运行example程序
 然后按提示，拷贝相关文件至开发板，并保证开发板网络通畅，即可运行程序进行测试。
 
-- face_detect: 人脸检测样例
+- face_detect: 小场景人脸检测样例，人脸尺寸最好大于图像最大边的1/5，否则可能检测不到人脸
 ```
 ./face_detect -a data/lyf1.jpg -b facemodel_vX.bin
 ```
 
 > `facemodel_vX.bin`： 注意，具体文件名请查看 `resources/models` 内，这里只是举例，下同。
 
-- face_detect_mscale: 人脸多尺度检测样例
+- face_detect_mscale: 人脸多尺度检测样例，这里将多个尺度的检测效果进行对比，尺度参数scaleN越大，可检测人脸尺寸越小
 ```
 ./face_detect_mscale  -b facemodel_vX.bin  -a  data/faces1.png
 ```

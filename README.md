@@ -73,6 +73,8 @@ ntpd: setting time to 2020-05-13 07:15:47.034944 (offset +1589348731.741161s)
 ./face_detect -a data/lyf1.jpg -b facemodel_vX.bin
 ```
 
+> `facemodel_vX.bin`： 注意，具体文件名请查看 `resources/models` 内，这里只是举例，下同。
+
 - face_detect_mscale: 人脸多尺度检测样例
 ```
 ./face_detect_mscale  -b facemodel_vX.bin  -a  data/faces1.png

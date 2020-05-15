@@ -7,6 +7,7 @@
 
 #include <fstream>
 #include <nlohmann/json.hpp>
+
 #include "opencv2/opencv.hpp"
 #include "sz_face_module.h"
 #include "sz_image_module.h"
@@ -18,7 +19,7 @@ void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
   std::string saveName =
       std::string(jpgFile) + "_scale_" + std::to_string(scaleN) + ".jpg";
 
-  cv::Mat image(h, w, CV_8UC3, (void*)pData);
+  cv::Mat image(h, w, CV_8UC3, (void *)pData);
 
   SZ_FACE_DETECTION faceInfo;
   SZ_RETCODE ret;
@@ -33,8 +34,10 @@ void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
            faceInfo.rect.x, faceInfo.rect.y, faceInfo.rect.width,
            faceInfo.rect.height);
 
-    cv::rectangle(image, cv::Rect(faceInfo.rect.x, faceInfo.rect.y,
-                                  faceInfo.rect.width, faceInfo.rect.height), cv::Scalar(255,0,0), 2);
+    cv::rectangle(image,
+                  cv::Rect(faceInfo.rect.x, faceInfo.rect.y,
+                           faceInfo.rect.width, faceInfo.rect.height),
+                  cv::Scalar(255, 0, 0), 2);
   }
 
   cv::imwrite(saveName.c_str(), image);
@@ -42,13 +45,17 @@ void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
 
 unsigned char *loadModel(const char *modelFile, int *pModelLen) {
   FILE *fp = fopen(modelFile, "r");
-  if (fp == NULL) return NULL;
+  if (fp == NULL) {
+    printf("[ERR] Model file %s not exists\n", modelFile);
+    return NULL;
+  }
 
   //获取模型文件长度
   fseek(fp, 0L, SEEK_END);
   int fileLen = 0;
   if ((fileLen = ftell(fp)) == -1) {
     fclose(fp);
+    printf("[ERR] Read file %s len failed\n", modelFile);
     return NULL;
   }
 
@@ -56,6 +63,7 @@ unsigned char *loadModel(const char *modelFile, int *pModelLen) {
   unsigned char *pModelData = (unsigned char *)malloc(fileLen);
   if (pModelData == NULL) {
     fclose(fp);
+    printf("[ERR] Alloc mem failed\n");
     return NULL;
   }
 
@@ -65,6 +73,7 @@ unsigned char *loadModel(const char *modelFile, int *pModelLen) {
   *pModelLen = fread(pModelData, 1, fileLen, fp);
   if ((*pModelLen) != fileLen) {
     fclose(fp);
+    printf("[ERR] Read file %s failed\n", modelFile);
     return NULL;
   }
 
@@ -148,19 +157,19 @@ JUMP:
 }
 
 SZ_RETCODE init_handles(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
-												SZ_LICENSE_CTX **pLicenseCtx) {
-	SZ_NET_CTX *netCtx = NULL;
-	if (init_handles_ex(modelFile, pFaceCtx, pLicenseCtx, &netCtx) != SZ_RETCODE_OK) {
-		return SZ_RETCODE_FAILED;
-	}
-	SZ_NET_detach(netCtx);
-	SZ_NET_CTX_release(netCtx);
-	return SZ_RETCODE_OK;
+                        SZ_LICENSE_CTX **pLicenseCtx) {
+  SZ_NET_CTX *netCtx = NULL;
+  if (init_handles_ex(modelFile, pFaceCtx, pLicenseCtx, &netCtx) !=
+      SZ_RETCODE_OK) {
+    return SZ_RETCODE_FAILED;
+  }
+  SZ_NET_detach(netCtx);
+  SZ_NET_CTX_release(netCtx);
+  return SZ_RETCODE_OK;
 }
 
-
 SZ_RETCODE init_handles_ex(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
-                        SZ_LICENSE_CTX **pLicenseCtx, SZ_NET_CTX **pNetCtx) {
+                           SZ_LICENSE_CTX **pLicenseCtx, SZ_NET_CTX **pNetCtx) {
   SZ_RETCODE ret;
   NetCreateOption opts = {0};
   opts.storagePath = (char *)".";

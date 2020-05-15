@@ -61,13 +61,13 @@ if(DOWNLOAD_DEPENDENCY)
 
   download_and_extract(
     URL
-    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/deps/prebuild-3rd-0.1.2.tar.gz
+    https://quvision.oss-cn-beijing.aliyuncs.com/qufacesdk/deps/prebuild-3rd-0.1.3.tar.gz
     FILENAME
-    ${DOWNLOAD_DIR}/prebuild-3rd-0.1.2.tar.gz
+    ${DOWNLOAD_DIR}/prebuild-3rd-0.1.3.tar.gz
     HASH_TYPE
     SHA256
     HASH
-    2f129d529e599395b29b21b6d7d5b694b5f158f573433a2f911c834cb314e148
+    ce34e1a94997f7980e67b4a681184a52bccbf7d4c8e19f347e8aed77f3fe6dfd
     EXTRACT_DIR
     ${THIRD_PARTY_PREFIX})
 

@@ -176,6 +176,11 @@ SZ_RETCODE init_handles_ex(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
   opts.clientId = (char *)"QufaceHisiDemo";
 
   std::ifstream i("device_info.json");
+  if (!i.is_open()) {
+    printf("[ERR] device_info.json not present\n");
+    return SZ_RETCODE_FAILED;
+  }
+
   nlohmann::json device_info;
   i >> device_info;
 

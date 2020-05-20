@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "sdk_common.h"
@@ -68,6 +69,7 @@ int main(int argc, char** argv) {
   SZ_FACE_QUALITY quality;
   SZ_INT32 featureLen = 0;
   int faceCnt = 0;
+  SZ_FACE_DETECTION pFaceInfos[128];
 
   // ********************
   // 读入一张jpg人脸照片
@@ -94,39 +96,21 @@ int main(int argc, char** argv) {
   }
 
   // ********************
-  // face detect scaleN=3 and save results to File
+  // face detect in 1080P and save results to File
   // ********************
-  int scaleN = 3;
-  ret = SZ_FACE_detect_mscale(faceCtx, imgCtx, scaleN, &faceCnt);
+  struct timespec start, next, end;
+  long spend;
+  clock_gettime(0, &start);
+  ret = SZ_FACE_detectAndGetInfo_1080P(faceCtx, imgCtx, pFaceInfos, &faceCnt);
+  clock_gettime(0, &end);
+  spend = (end.tv_sec - start.tv_sec) * 1000 +
+          (end.tv_nsec - start.tv_nsec) / 1000000;
+  printf("\n[face detection]===== TIME SPEND: %ld ms =====\n", spend);
   if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
     printf("[ERR] SZ_FACE_detect failed !\n");
   } else {
-    saveDetection2File(jpgFile, pBgrData, width, height, scaleN, faceCnt,
-                       faceCtx);
-  }
-
-  // ********************
-  // face detect scaleN=5 and save results to File
-  // ********************
-  scaleN = 5;
-  ret = SZ_FACE_detect_mscale(faceCtx, imgCtx, scaleN, &faceCnt);
-  if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
-    printf("[ERR] SZ_FACE_detect failed !\n");
-  } else {
-    saveDetection2File(jpgFile, pBgrData, width, height, scaleN, faceCnt,
-                       faceCtx);
-  }
-
-  // ********************
-  // face detect scaleN=7 and save results to File
-  // ********************
-  scaleN = 7;
-  ret = SZ_FACE_detect_mscale(faceCtx, imgCtx, scaleN, &faceCnt);
-  if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
-    printf("[ERR] SZ_FACE_detect failed !\n");
-  } else {
-    saveDetection2File(jpgFile, pBgrData, width, height, scaleN, faceCnt,
-                       faceCtx);
+    saveDetection2File(jpgFile, pBgrData, width, height, 1080, faceCnt,
+                       pFaceInfos);
   }
 
 JUMP:

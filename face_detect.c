@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "sdk_common.h"
@@ -63,11 +64,10 @@ int main(int argc, char** argv) {
   //创建一个图像句柄
   SZ_IMAGE_CTX* imgCtx = NULL;
   SZ_BOOL bOk = SZ_FALSE;
-  SZ_FLOAT compareScore = 0.0;
-  SZ_FACE_FEATURE* pFeature = NULL;
   SZ_FACE_QUALITY quality;
   SZ_INT32 featureLen = 0;
   int faceCnt = 0;
+  SZ_FACE_DETECTION pFaceInfos[128];
 
   // **********
   // 读入第一张jpg人脸照片,然后得到人脸特征值
@@ -78,21 +78,24 @@ int main(int argc, char** argv) {
     goto JUMP;
   }
 
-  ret = SZ_FACE_detect(faceCtx, imgCtx, &faceCnt);
+  clock_t t1, t2;
+  long spend;
+  struct timespec start, next, end;
+  clock_gettime(0, &start);
+  ret = SZ_FACE_detectAndGetInfo(faceCtx, imgCtx, pFaceInfos, &faceCnt);
+  clock_gettime(0, &end);
+  spend = (end.tv_sec - start.tv_sec) * 1000 +
+          (end.tv_nsec - start.tv_nsec) / 1000000;
+  printf("\n[Detection]===== TIME SPEND: %ld ms =====\n", spend);
+
   if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
     printf("[ERR] SZ_FACE_detect failed !\n");
     goto JUMP;
   }
 
-
   SZ_FACE_DETECTION faceInfo;
   for (SZ_INT32 idx = 0; idx < faceCnt; idx++) {
-    ret = SZ_FACE_getDetectInfo(faceCtx, idx, &faceInfo);
-    if (ret != SZ_RETCODE_OK) {
-      printf("[ERR] SZ_FACE_getDetectInfo(%d) failed!\n", idx);
-      continue;
-    }
-
+    faceInfo = pFaceInfos[idx];
     printf("Face_%d: [x=%d, y=%d, w=%d, h=%d]\n", idx, faceInfo.rect.x,
            faceInfo.rect.y, faceInfo.rect.width, faceInfo.rect.height);
   }

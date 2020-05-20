@@ -15,7 +15,8 @@
 #include "sz_net_module.h"
 
 void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
-                        int scaleN, int faceCnt, SZ_FACE_CTX *faceCtx) {
+                        int scaleN, int faceCnt,
+                        SZ_FACE_DETECTION *pFaceInfos) {
   std::string saveName =
       std::string(jpgFile) + "_scale_" + std::to_string(scaleN) + ".jpg";
 
@@ -24,12 +25,7 @@ void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
   SZ_FACE_DETECTION faceInfo;
   SZ_RETCODE ret;
   for (SZ_INT32 idx = 0; idx < faceCnt; idx++) {
-    ret = SZ_FACE_getDetectInfo(faceCtx, idx, &faceInfo);
-    if (ret != SZ_RETCODE_OK) {
-      printf("[ERR] SZ_FACE_getDetectInfo(%d) failed!\n", idx);
-      continue;
-    }
-
+    faceInfo = pFaceInfos[idx];
     printf("Scale-%d: Face-%d [x=%d, y=%d, w=%d, h=%d]\n", scaleN, idx,
            faceInfo.rect.x, faceInfo.rect.y, faceInfo.rect.width,
            faceInfo.rect.height);
@@ -38,6 +34,10 @@ void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
                   cv::Rect(faceInfo.rect.x, faceInfo.rect.y,
                            faceInfo.rect.width, faceInfo.rect.height),
                   cv::Scalar(255, 0, 0), 2);
+    for (int i = 0; i < 5; i++)
+      cv::circle(image,
+                 {faceInfo.points.point[i].x, faceInfo.points.point[i].y}, 1,
+                 cv::Scalar(0, 0, 255), 2);
   }
 
   cv::imwrite(saveName.c_str(), image);

@@ -52,6 +52,7 @@ int main(int argc, char **argv) {
   SZ_FACE_QUALITY quality;
   SZ_INT32 featureLen = 0;
   int faceCnt = 0;
+  SZ_FACE_DETECTION pFaceInfos[128];
   SZ_FACE_FEATURE *pfeatureList[IMG_NUM];
   float scores[IMG_NUM][IMG_NUM] = {1.0};
 
@@ -64,32 +65,22 @@ int main(int argc, char **argv) {
     bOk = getImageFromjpg(jpgFiles[i], &imgCtx);
     if (!bOk) goto JUMP;
 
-    ret = SZ_FACE_detect_mscale(faceCtx, imgCtx, 3, &faceCnt);
+    ret = SZ_FACE_detectAndGetInfo_smallPic(faceCtx, imgCtx, pFaceInfos,
+                                            &faceCnt);
     if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
       printf("[ERR] SZ_FACE_detect failed !\n");
       goto JUMP;
     }
 
-    SZ_FACE_DETECTION faceInfo;
-    for (SZ_INT32 idx = 0; idx < faceCnt; idx++) {
-      ret = SZ_FACE_getDetectInfo(faceCtx, idx, &faceInfo);
-      if (ret != SZ_RETCODE_OK) {
-        printf("[ERR] SZ_FACE_getDetectInfo(%d) failed!\n", idx);
-        continue;
-      }
-
-      printf("Face_%d: [x=%d, y=%d, w=%d, h=%d]\n", idx, faceInfo.rect.x,
-             faceInfo.rect.y, faceInfo.rect.width, faceInfo.rect.height);
-    }
-
-    ret = SZ_FACE_evaluate(faceCtx, imgCtx, 0, &quality);
-    printf("[INFO] face quality: (%f, %f, %f, %f, %f, %f)\n", quality.pitch,
-           quality.yaw, quality.roll, quality.leftScore, quality.rightScore,
-           quality.mouthScore);
-
     // 获取索引0的脸的特征
-    ret = SZ_FACE_extractFeatureByIndex(faceCtx, imgCtx, 0, &pFeature,
-                                        &featureLen);
+    SZ_FACE_DETECTION faceInfo = pFaceInfos[0];
+    printf("Face: [x=%d, y=%d, w=%d, h=%d]\n", faceInfo.rect.x, faceInfo.rect.y,
+           faceInfo.rect.width, faceInfo.rect.height);
+    for(int i=0; i<5; i++)printf(" %d:%f %f ",i, faceInfo.points.point[i].x, faceInfo.points.point[i].y);
+    printf("\n");
+
+    ret = SZ_FACE_extractFeatureByPosition(faceCtx, imgCtx, &faceInfo,
+                                           &pFeature, &featureLen);
     //保存抽取的特征，防止特征被覆盖
     pfeatureList[i] = (SZ_FACE_FEATURE *)malloc(featureLen);
     memcpy(pfeatureList[i], pFeature, featureLen);
@@ -136,5 +127,6 @@ JUMP:
   SZ_LICENSE_CTX_release(licenseCtx);
   SZ_IMAGE_CTX_release(imgCtx);
   for (int i = 0; i < IMG_NUM; i++) free(pfeatureList[i]);
+  SZ_FACE_CTX_release(faceCtx);
   return ret;
 }

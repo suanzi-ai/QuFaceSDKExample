@@ -14,6 +14,23 @@
 #include "sz_license_module.h"
 #include "sz_net_module.h"
 
+SZ_CONFIG szConfig = SZ_CONFIG{
+    .noNnieInit = SZ_FALSE,
+#ifdef DEBUG
+    .logLevel = (char *)"debug",
+#else
+    .logLevel = (char *)"info",
+#endif
+    .logToStd = (char *)"stdout",
+    .logToFile = (char *)"logs/quface.log",
+    .logToFileMaxFileSize = 10 * 1024 * 1024,
+    .logToFileMaxFiles = 5,
+    .faceEnable = (FACE_ENABLE)(FACE_ENABLE_DETECT | FACE_ENABLE_EXTRACT),     ///< 启用人脸检测功能
+    .faceImageWidth = 1920,
+    .faceImageHeight = 1080,
+    .faceMinSize = 100,
+};
+
 void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
                         int scaleN, int faceCnt,
                         SZ_FACE_DETECTION *pFaceInfos) {
@@ -35,9 +52,10 @@ void saveDetection2File(const char *jpgFile, const char *pData, int w, int h,
                            faceInfo.rect.width, faceInfo.rect.height),
                   cv::Scalar(255, 0, 0), 2);
     for (int i = 0; i < 5; i++)
-      cv::circle(image,
-                 {faceInfo.points.point[i].x, faceInfo.points.point[i].y}, 1,
-                 cv::Scalar(0, 0, 255), 2);
+      cv::circle(
+          image,
+          {(int)faceInfo.points.point[i].x, (int)faceInfo.points.point[i].y}, 2,
+          cv::Scalar(0, 0, 255), 2);
   }
 
   cv::imwrite(saveName.c_str(), image);
@@ -96,7 +114,7 @@ SZ_BOOL getFeature(const char *jpgFile, SZ_FACE_CTX *faceCtx,
     goto JUMP;
   }
 
-#if 1
+#if 0
 
   ret = SZ_FACE_detect(faceCtx, imgCtx, &faceCnt);
   if (ret != SZ_RETCODE_OK || faceCnt <= 0) {
@@ -113,10 +131,10 @@ SZ_BOOL getFeature(const char *jpgFile, SZ_FACE_CTX *faceCtx,
   ret =
       SZ_FACE_extractFeatureByIndex(faceCtx, imgCtx, 0, pFeature, pFeatureLen);
 #else
-  SZ_RECT rect = {0, 0, width, height};
-  printf("%d %d %d %d \n", rect.x, rect.y, rect.width, rect.height);
-  ret = SZ_FACE_extractFeatureByPosition(faceCtx, imgCtx, &rect, pFeature,
-                                         pFeatureLen);
+  // SZ_RECT rect = {0, 0, width, height};
+  // printf("%d %d %d %d \n", rect.x, rect.y, rect.width, rect.height);
+  // ret = SZ_FACE_extractFeatureByPosition(faceCtx, imgCtx, &rect, pFeature,
+  //                                       pFeatureLen);
 #endif
   if (ret != SZ_RETCODE_OK) goto JUMP;
   bOk = SZ_TRUE;
@@ -171,6 +189,12 @@ SZ_RETCODE init_handles(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
 SZ_RETCODE init_handles_ex(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
                            SZ_LICENSE_CTX **pLicenseCtx, SZ_NET_CTX **pNetCtx) {
   SZ_RETCODE ret;
+  ret = SZ_CONFIG_set(&szConfig);
+  ret = SZ_CONFIG_setFromEnv();
+  if (ret != SZ_RETCODE_OK) {
+    printf("[ERR] load config from env failed\n");
+  }
+
   NetCreateOption opts = {0};
   opts.storagePath = (char *)".";
   opts.clientId = (char *)"QufaceHisiDemo";
@@ -226,15 +250,18 @@ SZ_RETCODE init_handles_ex(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
     return ret;
   }
 
-  //加载模型
-  int modelLen = 0;
-  unsigned char *pModelData = loadModel(modelFile, &modelLen);
-  *pFaceCtx = SZ_FACE_CTX_create(*pLicenseCtx, pModelData, modelLen);
-  free(pModelData);
+  *pFaceCtx = SZ_FACE_CTX_create(*pLicenseCtx, NULL, 0);
   if (*pFaceCtx == NULL) {
     printf("[ERR] SZ_FACE_CTX_create failed !\n");
     return SZ_RETCODE_FAILED;
   }
+
+  ret = SZ_FACE_loadModelFromFile(*pFaceCtx, modelFile);
+  if (ret != SZ_RETCODE_OK) {
+    printf("[ERR] SZ_FACE_loadModelFromFile failed !\n");
+    return ret;
+  }
+
   return SZ_RETCODE_OK;
 }
 

@@ -67,7 +67,7 @@ int main(int argc, char** argv) {
   SZ_FACE_QUALITY quality;
   SZ_INT32 featureLen = 0;
   int faceCnt = 0;
-  SZ_FACE_DETECTION pFaceInfos[128];
+  SZ_FACE_DETECTION *pFaceInfos = NULL;
 
   // **********
   // 读入第一张jpg人脸照片,然后得到人脸特征值
@@ -82,7 +82,7 @@ int main(int argc, char** argv) {
   long spend;
   struct timespec start, next, end;
   clock_gettime(0, &start);
-  ret = SZ_FACE_detectAndGetInfo(faceCtx, imgCtx, pFaceInfos, &faceCnt);
+  ret = SZ_FACE_detectAndGetInfo(faceCtx, imgCtx, &pFaceInfos, &faceCnt);
   clock_gettime(0, &end);
   spend = (end.tv_sec - start.tv_sec) * 1000 +
           (end.tv_nsec - start.tv_nsec) / 1000000;

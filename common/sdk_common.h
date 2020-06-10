@@ -9,6 +9,7 @@
 
 #include "sz_common.h"
 #include "sz_face_module.h"
+#include "sz_head_module.h"
 
 #define MAX_FILE_LEN 256
 #ifdef __cplusplus
@@ -34,6 +35,20 @@ SZ_RETCODE init_handles_ex(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
 
 SZ_RETCODE init_handles(const char *modelFile, SZ_FACE_CTX **pFaceCtx,
                         SZ_LICENSE_CTX **pLicenseCtx);
+
+// head
+SZ_RETCODE init_handles_ex_head(const char *modelFile, SZ_HEAD_CTX **pHeadCtx,
+                                SZ_LICENSE_CTX **pLicenseCtx,
+                                SZ_NET_CTX **pNetCtx, SZ_HEAD_CONFIG *config);
+
+SZ_RETCODE init_handles_head(const char *modelFile, SZ_HEAD_CTX **pHeadCtx,
+                             SZ_LICENSE_CTX **pLicenseCtx,
+                             SZ_HEAD_CONFIG *config);
+
+void saveDetection2File_head(const char *jpgFile, const char *pData, int w,
+                             int h, int iModel,
+                             SZ_HEAD_DETECTION_LIST detectResult);
+
 
 #ifdef __cplusplus
 }

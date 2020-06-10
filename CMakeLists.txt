@@ -137,6 +137,9 @@ add_executable(face_query face_query.c)
 target_link_libraries(face_query example_common QuFaceSDK::face
                       QuFaceSDK::database)
 
+add_executable(head_detect head_detect.c)
+target_link_libraries(head_detect example_common QuFaceSDK::face QuFaceSDK::head)
+
 install(
   TARGETS face_compare_multi
           face_compare
@@ -145,6 +148,7 @@ install(
           face_detect
           face_detect_mscale
           face_query
+          head_detect
   DESTINATION .)
 install(DIRECTORY ${CMAKE_SOURCE_DIR}/data ${RESOURCE_PREFIX}/models/
         DESTINATION .)

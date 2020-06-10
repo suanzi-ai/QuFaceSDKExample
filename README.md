@@ -35,6 +35,7 @@ cd QuFaceSDKExample
 - face_compare_multi: 多人脸比对样例
 - face_query: 人脸检索样例
 - face_db_server: 人脸库远程更新样例
+- head_detect: 人头检测样例
 
 ### 运行
 
@@ -99,3 +100,12 @@ ntpd: setting time to 2020-05-13 07:15:47.034944 (offset +1589348731.741161s)
 - face_query: 人脸检索样例
 
 - face_db_server: 人脸库远程更新样例
+
+
+#### 运行head_detect
+
+- head_detect: 人头检测样例【目前该功能不可免费使用】
+```
+./head_detect -a data/faces1.png  -b headmodel.bin
+```
+检测结果图像保存为data/faces1.png_scale_0.jpg。

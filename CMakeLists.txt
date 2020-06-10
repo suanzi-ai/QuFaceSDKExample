@@ -19,7 +19,7 @@ endif()
 
 project(
   QuFaceSDKExample
-  VERSION 0.3.0
+  VERSION 0.4.0
   DESCRIPTION "QuFace SDK example")
 
 set(CMAKE_CXX_STANDARD 11)
